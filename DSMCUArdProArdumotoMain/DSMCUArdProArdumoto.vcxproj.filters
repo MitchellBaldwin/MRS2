@@ -15,21 +15,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="DSMCUArdProArdumoto.ino" />
+    <None Include="DSMCUArdProArdumotoMain.ino" />
     <None Include="src\arduino folders read me.txt">
       <Filter>Misc Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="__vm\.DSMCUArdProArdumoto.vsarduino.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DSNCUArdProArdumoto.h">
+    <ClInclude Include="DSMCUArdProArdumoto.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DSNCUArdProArdumoto.cpp">
+    <ClCompile Include="DSMCUArdProArdumoto.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
