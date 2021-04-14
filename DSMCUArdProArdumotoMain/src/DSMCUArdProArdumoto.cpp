@@ -1,5 +1,4 @@
 #include "DSMCUArdProArdumoto.h"
-#include "DriveSystemPacketDefs.h"
 
 #include <Wire.h>
 
@@ -57,19 +56,14 @@ bool DSMCUArdProArdumoto::TestMotors()
 	SetMotor(RightMotor, REVERSE, 127);
 	delay(2000);
 	SetMotor(RightMotor, 0, 0);
-	return false;
+	return true;
 }
 
-bool DSMCUArdProArdumoto::TestDisplay()
+bool DSMCUArdProArdumoto::TestLocalDisplay()
 {
 	Wire.beginTransmission(I2C_ADDRESS_SA0_1);
 	if (Wire.endTransmission(0) == 0)
 	{
-		uint8_t screenWidth = oled.getLCDWidth();
-		uint8_t screenHeight = oled.getLCDHeight();
-		oled.setCursor(0, 10);
-		oled.print("WxH: " + String(screenWidth) + "x" + String(screenHeight));
-		oled.display();
 		DisplayPresent = true;
 	}
 	else
@@ -90,6 +84,22 @@ void DSMCUArdProArdumoto::ExecuteCommand(uint8_t command, uint8_t* commandPayloa
 
 	switch (command)
 	{
+	case ArduinoControllerPacketTypes::GetMRSStatus:
+	{
+		// Return the Drive System MCU Status Report packet:
+		GetStatusReport();
+		commandHandled = true;
+	}
+	break;
+
+	case ArduinoControllerPacketTypes::GetDSMCUStatus:
+	{
+		// Return the Drive System MCU Status Report packet:
+		GetStatusReport();
+		commandHandled = true;
+	}
+	break;
+
 	case ArduinoControllerPacketTypes::MRSTextMessage:
 	{
 		// Display the incoming text message locally (and/or log it):
@@ -121,21 +131,19 @@ void DSMCUArdProArdumoto::ExecuteCommand(uint8_t command, uint8_t* commandPayloa
 		//int16_t speed = *((int16_t*)raw);
 
 		// Build and send Drive System Status Packet:
-		DSStatusPacket DSSP;
-		DSSP.Measurements.VSupply = VBat5Raw;
+		//DSSP.Measurements.VSupply = VBat5Raw;	// Handled in Update()
 		DSSP.Measurements.LMotorCurrent = 0;
 		DSSP.Measurements.RMotorCurrent = 0;
 		DSSP.Measurements.LActuatorSpeed = speed;
 		DSSP.Measurements.RActuatorSpeed = speed;
-		ClientConnection.outPacket[0] = ArduinoControllerPacketTypes::DSMCUStatusPacket;
-		for (int i = 0; i < sizeof(DSSP); ++i)
-		{
-			ClientConnection.outPacketPayload[i] = *((byte*)(&DSSP) + i);
-		}
-		ClientConnection.SendPacket();
+		GetStatusReport();
 
+		// Display actuator speeds locally (assume display width is 10 characters):
+		char format[] = "L%03d  R%03d";
+		char buffer[11];
+		sprintf(buffer, format, DSSP.Measurements.LActuatorSpeed, DSSP.Measurements.RActuatorSpeed);
 		oled.setCursor(0, 20);
-		oled.print("Speed: " + String(speed));
+		oled.print(buffer);
 		oled.display();
 
 		byte direction = FORWARD;
@@ -154,8 +162,13 @@ void DSMCUArdProArdumoto::ExecuteCommand(uint8_t command, uint8_t* commandPayloa
 	case ArduinoControllerPacketTypes::RunSystemDiagnostics:
 	{
 		// Run demo / test of local display hardware:
-		if (TestDisplay())
+		if (TestLocalDisplay())
 		{
+			uint8_t screenWidth = oled.getLCDWidth();
+			uint8_t screenHeight = oled.getLCDHeight();
+			oled.setCursor(0, 10);
+			oled.print("WxH: " + String(screenWidth) + "x" + String(screenHeight));
+			oled.display();
 			ArduinoControllerBase::SendTextMessage("Local display OK");
 		}
 		else
@@ -163,7 +176,7 @@ void DSMCUArdProArdumoto::ExecuteCommand(uint8_t command, uint8_t* commandPayloa
 			ArduinoControllerBase::SendTextMessage("Local display FAIL");
 		}
 
-		// Run demo / test of local display hardware:
+		// Run demo / test of motor control hardware:
 		if (TestMotors())
 		{
 			ArduinoControllerBase::SendTextMessage("Motor test complete");
@@ -180,8 +193,13 @@ void DSMCUArdProArdumoto::ExecuteCommand(uint8_t command, uint8_t* commandPayloa
 	case ArduinoControllerPacketTypes::TestLocalDisplay:
 	{
 		// Run demo / test of local display hardware:
-		if (TestDisplay())
+		if (TestLocalDisplay())
 		{
+			uint8_t screenWidth = oled.getLCDWidth();
+			uint8_t screenHeight = oled.getLCDHeight();
+			oled.setCursor(0, 10);
+			oled.print("WxH: " + String(screenWidth) + "x" + String(screenHeight));
+			oled.display();
 			ArduinoControllerBase::SendTextMessage("Local display OK");
 		}
 		else
@@ -212,17 +230,35 @@ void DSMCUArdProArdumoto::ExecuteCommand(uint8_t command, uint8_t* commandPayloa
 
 void DSMCUArdProArdumoto::GetStatusReport()
 {
-	ArduinoControllerBase::GetStatusReport();
+	//DSSP.Measurements.VSupply = VBat5Raw;			// Status packet fields are updated by functions where settings are made
+	//DSSP.Measurements.LMotorCurrent = 0;			//or measurements are taken
+	//DSSP.Measurements.RMotorCurrent = 0;
+	//DSSP.Measurements.LActuatorSpeed = speed;
+	//DSSP.Measurements.RActuatorSpeed = speed;
+	ClientConnection.outPacket[0] = ArduinoControllerPacketTypes::DSMCUStatusPacket;
+	for (int i = 0; i < sizeof(DSSP); ++i)
+	{
+		ClientConnection.outPacketPayload[i] = *((byte*)(&DSSP) + i);
+	}
+	ClientConnection.SendPacket();
+
 }
 
 void DSMCUArdProArdumoto::Init(PacketSerial::PacketHandlerFunction OnSerialClientMessage)
 {
 	ArduinoControllerBase::Init(SerialClient::SerialOverUSB, OnSerialClientMessage);
+	
 	SetupArdumotoBoard();
+
+	DSSP.Measurements.VSupply = analogRead(VMotorPin);
+	DSSP.Measurements.LActuatorSpeed = 0;
+	DSSP.Measurements.RActuatorSpeed = 0;
+	DSSP.Measurements.LMotorCurrent = 0;
+	DSSP.Measurements.RMotorCurrent = 0;
 
 	Wire.begin();
 	delay(100);
-	if (TestDisplay())
+	if (TestLocalDisplay())
 	{
 		oled.begin();			// Initialize the OLED
 		oled.clear(PAGE); // Clear the display's internal memory
@@ -236,6 +272,7 @@ void DSMCUArdProArdumoto::Update()
 	ArduinoControllerBase::Update();
 	// Read and display battery supply voltage
 	VBat5Raw = analogRead(VMotorPin);
+	DSSP.Measurements.VSupply = VBat5Raw;
 	oled.setCursor(0, 0);
 	oled.print("VBat5: " + String(VBat5Raw));
 	oled.display();

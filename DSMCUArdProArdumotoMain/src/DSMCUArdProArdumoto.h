@@ -1,5 +1,6 @@
 #pragma once
 #include <ArduinoControllerBase.h>
+#include "DriveSystemPacketDefs.h"
 
 #include <SFE_MicroOLED.h>
 
@@ -27,6 +28,7 @@ constexpr byte VMotorPin = A0;
 class DSMCUArdProArdumoto : public ArduinoControllerBase
 {
 private:
+	DSStatusPacket DSSP;
 	void SetupArdumotoBoard();
 	//void StopMotor(byte);
 	//void StopBothMotors();
@@ -37,8 +39,7 @@ private:
 protected:
 	MicroOLED oled = MicroOLED(PIN_RESET, DC_JUMPER);
 	bool TestMotors();
-	bool TestDisplay();
-	//virtual bool TestLocalDisplay();
+	virtual bool TestLocalDisplay();
 	//virtual void ExecuteCommand(uint8_t);
 	virtual void ExecuteCommand(uint8_t, uint8_t*);
 	virtual void GetStatusReport();

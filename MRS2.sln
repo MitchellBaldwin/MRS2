@@ -9,6 +9,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DSMCUArdProArdumotoMain", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArduinoController-0.0.0", "..\..\..\Arduino\Sketchbook\libraries\ArduinoController\ArduinoController-0.0.0.vcxitems", "{4336072A-484C-44C6-B431-CE76A9BEE8B8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KY-040 Test", "KY-040 Test\KY-040 Test.vcxproj", "{E2290822-CC72-4A22-8B5C-D714C6FE4222}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MFCD4Duino", "MFCD4Duino\MFCD4Duino.vcxproj", "{27783147-AD66-4DCB-81BE-186341453CB6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestESPNOW", "TestESPNOW\TestESPNOW.vcxproj", "{92C1FBB3-768E-47C3-B515-1211AEEAC791}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\..\..\Arduino\Sketchbook\libraries\ArduinoController\ArduinoController-0.0.0.vcxitems*{4336072a-484c-44c6-b431-ce76a9bee8b8}*SharedItemsImports = 9
@@ -35,6 +41,24 @@ Global
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|Any CPU.ActiveCfg = Release|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.ActiveCfg = Release|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.Build.0 = Release|Win32
+		{E2290822-CC72-4A22-8B5C-D714C6FE4222}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{E2290822-CC72-4A22-8B5C-D714C6FE4222}.Debug|x86.ActiveCfg = Debug|Win32
+		{E2290822-CC72-4A22-8B5C-D714C6FE4222}.Debug|x86.Build.0 = Debug|Win32
+		{E2290822-CC72-4A22-8B5C-D714C6FE4222}.Release|Any CPU.ActiveCfg = Release|Win32
+		{E2290822-CC72-4A22-8B5C-D714C6FE4222}.Release|x86.ActiveCfg = Release|Win32
+		{E2290822-CC72-4A22-8B5C-D714C6FE4222}.Release|x86.Build.0 = Release|Win32
+		{27783147-AD66-4DCB-81BE-186341453CB6}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{27783147-AD66-4DCB-81BE-186341453CB6}.Debug|x86.ActiveCfg = Debug|Win32
+		{27783147-AD66-4DCB-81BE-186341453CB6}.Debug|x86.Build.0 = Debug|Win32
+		{27783147-AD66-4DCB-81BE-186341453CB6}.Release|Any CPU.ActiveCfg = Release|Win32
+		{27783147-AD66-4DCB-81BE-186341453CB6}.Release|x86.ActiveCfg = Release|Win32
+		{27783147-AD66-4DCB-81BE-186341453CB6}.Release|x86.Build.0 = Release|Win32
+		{92C1FBB3-768E-47C3-B515-1211AEEAC791}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{92C1FBB3-768E-47C3-B515-1211AEEAC791}.Debug|x86.ActiveCfg = Debug|Win32
+		{92C1FBB3-768E-47C3-B515-1211AEEAC791}.Debug|x86.Build.0 = Debug|Win32
+		{92C1FBB3-768E-47C3-B515-1211AEEAC791}.Release|Any CPU.ActiveCfg = Release|Win32
+		{92C1FBB3-768E-47C3-B515-1211AEEAC791}.Release|x86.ActiveCfg = Release|Win32
+		{92C1FBB3-768E-47C3-B515-1211AEEAC791}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
