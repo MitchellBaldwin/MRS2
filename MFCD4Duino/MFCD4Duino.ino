@@ -7,6 +7,17 @@
 // Define LOG_MESSAGES to a serial port to send SPE errors messages to. Do not use the same Serial port as SPE
 //#define LOG_MESSAGES Serial
 
+//#define LIBCALL_ENABLEINTERRUPT
+#define EI_NOTEXTERNAL
+// #define EI_NOTPINCHANGE allows successful compile
+// #define EI_NOTPORTB allows successful compile
+// #define EI_NOTINT0 does not compile: multiple definition of __vector_9
+// #define EI_NOTINT1 does not compile: multiple definition of __vector_9
+// #define EI_NOTINT2 does not compile: multiple definition of __vector_9
+// #define EI_NOTINT3 does not compile: multiple definition of __vector_9
+// #define EI_NOTINT6 does not compile: multiple definition of __vector_9
+#define EI_NOTPINCHANGE
+#include <EnableInterrupt.h>
 #include <ky-040.h>
 constexpr auto HDGENCCLK = 7;
 constexpr auto HDGENCDT = 6;
@@ -14,11 +25,11 @@ constexpr auto HDGENCPB = 5;
 
 ky040 HeadingEncoder(HDGENCCLK, HDGENCDT, HDGENCPB, 1);
 
-constexpr auto CRSENCCLK = 12;
+constexpr auto CRSENCCLK = 10;
 constexpr auto CRSENCDT = 11;
-constexpr auto CRSENCPB = 10;
+constexpr auto CRSENCPB = 12;
 
-//ky040 CourseEncoder(CRSENCCLK, CRSENCDT, CRSENCPB, 1);
+ky040 CourseEncoder(CRSENCCLK, CRSENCDT, CRSENCPB, 1);
 
 #include <Tasks.h>
 bool TimeToCheckInputs = false;
@@ -141,13 +152,16 @@ void setup()
 
 	
 																			
-																			// Set up left rotary encoder with default function of heading entry (HDG):
+	// Set up left rotary encoder with default function of heading entry (HDG):
 	HeadingEncoder.AddRotaryCounter(1, 0, 0, 359, 1, true);
 	HeadingEncoder.SetRotary(1);
 
+	enableInterrupt(CRSENCCLK, ky040::RotaryClkInterruptOn_10, CHANGE);
+	//enableInterrupt(CRSENCCLK, CheckInputs, CHANGE);
+
 	// Set up right rotary encoder with default function of course entry (CRS):
-	//CourseEncoder.AddRotaryCounter(1, 0, 0, 359, 1, true);
-	//CourseEncoder.SetRotary(1);
+	CourseEncoder.AddRotaryCounter(1, 0, 0, 359, 1, true);
+	CourseEncoder.SetRotary(1);
 
 
 
@@ -316,6 +330,23 @@ void loop()
 		Display.gfx_MoveTo(x, HDGDisplayTop);
 		Display.txt_FGcolour(SPRINGGREEN);
 		Display.print(HDGTextBuffer);
+
+	}
+	if (CourseEncoder.HasRotaryValueChanged(1))
+	{
+		//Serial.print("Pin " + arduinoInterruptedPin);
+		//Serial.println(" " + CourseEncoder.GetRotaryValue(1));
+		//Serial.println(CourseEncoder.GetRotaryValue(1));
+		int CRSDisplayWidth = 30;
+		int CRSDisplayLeft = screenWidth - CRSDisplayWidth;
+		int CRSDisplayTop = 300;
+		// Right justify display of CRS setting:
+		char CRSTextBuffer[4];
+		sprintf(CRSTextBuffer, "%03d", CourseEncoder.GetRotaryValue(1));
+		int x = CRSDisplayLeft + CRSDisplayWidth - 3 * Display.charwidth('0');
+		Display.gfx_MoveTo(x, CRSDisplayTop);
+		Display.txt_FGcolour(SPRINGGREEN);
+		Display.print(CRSTextBuffer);
 
 	}
 	if (TimeToCheckInputs)
